@@ -13,31 +13,24 @@ def main():
     page = 1
 
     while True:
+        print(f'Get articles from WordPress: page = {page}')
         response = get_from_wp({
             '_fields': 'title, link, featured_media',
-            'per_page': 50,
-            'page': page,
-        }, WP_POSTS_PATH)
+        }, f'{WP_POSTS_PATH}?per_page={50}&page={page}')
 
         if not response.ok:
+            print('No data.')
             break
 
         data = response.json()
+        print(f'Data length is {len(data)}')
+        # pprint.pprint(data)
+
         all_posts.extend(data)
         page += 1
 
-    # pprint.pprint(all_posts)
     picked = random.choice(all_posts)
     pprint.pprint(picked)
-
-    # response = get_from_wp({
-    #     '_fields': 'guid',
-    # }, f'{WP_MEDIA_PATH}/{picked["featured_media"]}')
-    # data = response.json()
-    # pprint.pprint(data)
-    #
-    # if response.ok:
-    #     url = data['guid']['rendered']
 
     text = f'{picked["title"]["rendered"]} {picked["link"]}'
     client = twitter_client_builder.create_twitter_client()
